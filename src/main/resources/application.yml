@@ -1,0 +1,11 @@
+logging:
+  pattern:
+    file: "[%d{HH:mm:ss.SSS}][%-5level][%logger.%method:line%line] - %msg%n"
+    rolling-file-name: "/logs/abc.%d{yyyy-MM-dd}.%i"
+
+  file:
+    name: /logs/abc.log
+    max-history: 30
+  level:
+    org:
+      springframework: INFO
