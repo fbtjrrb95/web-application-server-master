@@ -63,6 +63,8 @@ public class RequestHandler extends Thread {
         if("/index.html".equals(url)){
             return Files.readAllBytes(new File("./webapp" + url).toPath());
         }
-        return "Hello World".getBytes();
+
+        String defaultText = "Hello Test World ";
+        return defaultText.getBytes();
     }
 }
