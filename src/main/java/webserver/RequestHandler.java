@@ -21,7 +21,7 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream();
-             OutputStream out = connection.getOutputStream() ) {
+             OutputStream out = connection.getOutputStream()) {
 
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
@@ -60,7 +60,7 @@ public class RequestHandler extends Thread {
 
         String[] tokens = line.split(" ");
         String url = tokens[1];
-        if("/index.html".equals(url)){
+        if ("/index.html".equals(url)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
         }
 
