@@ -2,6 +2,7 @@ package webserver;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 
 import org.slf4j.Logger;
@@ -21,14 +22,19 @@ public class RequestHandler extends Thread {
                 connection.getPort());
 
         try (InputStream in = connection.getInputStream();
-             OutputStream out = connection.getOutputStream() ) {
+             OutputStream out = connection.getOutputStream()) {
 
             DataOutputStream dos = new DataOutputStream(out);
-            BufferedReader br = new BufferedReader(new InputStreamReader(in, "UTF-8"));
+            BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+
+            // http 요청 정보 전체 출력
+            this.printHttpRequest(br);
 
             byte[] body = toBytes(br);
+
             response200Header(dos, body.length);
             responseBody(dos, body);
+
         } catch (IOException e) {
             log.error(e.getMessage());
         }
@@ -60,11 +66,24 @@ public class RequestHandler extends Thread {
 
         String[] tokens = line.split(" ");
         String url = tokens[1];
-        if("/index.html".equals(url)){
+
+
+        if ("/index.html".equals(url)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
         }
 
         String defaultText = "Hello Test World ";
         return defaultText.getBytes();
+    }
+
+    private void printHttpRequest(BufferedReader br) throws IOException {
+
+        String line = br.readLine();
+
+        while(!"".equals(line)) {
+            log.info(line);
+            line = br.readLine();
+
+        }
     }
 }
