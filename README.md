@@ -15,7 +15,15 @@
 * 각 요구사항을 구현하는 것이 중요한 것이 아니라 구현 과정을 통해 학습한 내용을 인식하는 것이 배움에 중요하다. 
 
 ### 요구사항 1 - http://localhost:8080/index.html로 접속시 응답
-* 
+* inputStream 으로 문자열 읽는 방법
+```
+    BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
+    String line = br.readLine();
+``` 
+
+* DataOutStream 에 내가 출력하길 원하는 내용 (텍스트, 파일) 등을 바이트로 변환하여 write 한다. 
+  * responseBody 참고
+  * response200Header 참고
 
 ### 요구사항 2 - get 방식으로 회원가입
 * 
