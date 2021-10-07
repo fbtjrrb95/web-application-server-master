@@ -39,7 +39,7 @@ public class RequestHandler extends Thread {
                     return;
                 }
 
-                log.info(line);
+                log.debug(line);
                 line = br.readLine();
 
             }
