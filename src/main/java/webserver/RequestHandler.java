@@ -77,7 +77,7 @@ public class RequestHandler extends Thread {
         String[] tokens = line.split(" ");
         String url = tokens[1];
 
-        if ("/index.html".equals(url)) {
+        if ("/index.html".equals(url) || "/user/form.html".equals(url)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
         }
 
