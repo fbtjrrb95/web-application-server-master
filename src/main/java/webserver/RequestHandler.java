@@ -27,10 +27,22 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            // http 요청 정보 전체 출력
-            this.printHttpRequest(br);
 
-            byte[] body = toBytes(br);
+            String line = br.readLine();
+
+            byte[] body = toBytes(line);
+
+            while (!"".equals(line)) {
+
+                // line null check 를 하지 않으면 무한 루프에 빠질 수 있음.
+                if (line == null) {
+                    return;
+                }
+
+                log.info(line);
+                line = br.readLine();
+
+            }
 
             response200Header(dos, body.length);
             responseBody(dos, body);
@@ -60,13 +72,10 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private byte[] toBytes(BufferedReader br) throws IOException {
-
-        String line = br.readLine();
+    private byte[] toBytes(String line) throws IOException {
 
         String[] tokens = line.split(" ");
         String url = tokens[1];
-
 
         if ("/index.html".equals(url)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -74,16 +83,5 @@ public class RequestHandler extends Thread {
 
         String defaultText = "Hello Test World ";
         return defaultText.getBytes();
-    }
-
-    private void printHttpRequest(BufferedReader br) throws IOException {
-
-        String line = br.readLine();
-
-        while(!"".equals(line)) {
-            log.info(line);
-            line = br.readLine();
-
-        }
     }
 }
