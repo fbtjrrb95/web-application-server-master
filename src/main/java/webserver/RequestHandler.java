@@ -80,6 +80,7 @@ public class RequestHandler extends Thread {
         String[] tokens = line.split(" ");
         String url = tokens[1];
 
+        // parsing url -> requestPath, queryString
         int index = url.indexOf("?");
         String requestPath = index > -1 ? url.substring(0, index) : url;
         String params = url.substring(index + 1);
