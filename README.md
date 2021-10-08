@@ -20,10 +20,12 @@
     BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
     String line = br.readLine();
 ``` 
+* BufferedReader 를 readLine 을 하고, 다시 readLine 을 할 수 없다. 이미 포인터가 마지막에 있기 때문이다. 
 
 * DataOutStream 에 내가 출력하길 원하는 내용 (텍스트, 파일) 등을 바이트로 변환하여 write 한다. 
   * responseBody 참고
   * response200Header 참고
+  
 
 ### 요구사항 2 - get 방식으로 회원가입
 * 

@@ -1,12 +1,15 @@
 package webserver;
 
+import model.User;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import util.HttpRequestUtils;
+
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.util.Map;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -39,7 +42,7 @@ public class RequestHandler extends Thread {
                     return;
                 }
 
-                log.info(line);
+                log.debug(line);
                 line = br.readLine();
 
             }
@@ -77,8 +80,28 @@ public class RequestHandler extends Thread {
         String[] tokens = line.split(" ");
         String url = tokens[1];
 
-        if ("/index.html".equals(url)) {
+        int index = url.indexOf("?");
+        String requestPath = index > -1 ? url.substring(0, index) : url;
+        String params = url.substring(index + 1);
+        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
+
+
+        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
+        }
+
+        if ("/user/create".equals(requestPath)) {
+
+            String userId = queryStringMap.get("userId");
+            String password = queryStringMap.get("password");
+            String name = queryStringMap.get("name");
+            String email = queryStringMap.get("email");
+
+            User user = new User(userId, password, name, email);
+
+            log.debug(user.toString());
+
+            return Files.readAllBytes(new File("./webapp/index.html").toPath());
         }
 
         String defaultText = "Hello Test World ";
