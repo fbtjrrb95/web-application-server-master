@@ -90,6 +90,7 @@ public class RequestHandler extends Thread {
         headerMap.put("url", url);
         headerMap.put("protocol", protocol);
 
+        // parsing url -> requestPath, queryString
         int index = url.indexOf("?");
         if (index > -1) {
             String requestPath = url.substring(0, index);
