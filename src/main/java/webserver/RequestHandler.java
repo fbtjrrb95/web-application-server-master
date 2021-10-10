@@ -4,11 +4,13 @@ import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
+import util.IOUtils;
 
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.Map;
 
 public class RequestHandler extends Thread {
@@ -30,22 +32,18 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
+            Map<String, String> headerMap = this.getHeaderMap(br);
 
-            String line = br.readLine();
-
-            byte[] body = toBytes(line);
-
-            while (!"".equals(line)) {
-
-                // line null check 를 하지 않으면 무한 루프에 빠질 수 있음.
-                if (line == null) {
-                    return;
-                }
-
-                log.debug(line);
-                line = br.readLine();
-
+            String contentLengthString = headerMap.get("Content-Length");
+            int contentLength = 0;
+            if (contentLengthString != null && !contentLengthString.isEmpty()) {
+                contentLength = Integer.parseInt(contentLengthString);
             }
+
+            Map<String, String> bodyMap = this.getBodyMap(br, contentLength);
+            log.debug("headerMap : " + headerMap);
+            log.debug("bodyMap : " + bodyMap);
+            byte[] body = toBytes(headerMap, bodyMap);
 
             response200Header(dos, body.length);
             responseBody(dos, body);
@@ -75,17 +73,65 @@ public class RequestHandler extends Thread {
         }
     }
 
-    private byte[] toBytes(String line) throws IOException {
+    private Map<String, String> getHeaderMap(BufferedReader br) throws IOException {
+
+        Map<String, String> headerMap = new HashMap<>();
+
+        String line = br.readLine();
+        log.debug(line);
 
         String[] tokens = line.split(" ");
+
+        String method = tokens[0];
         String url = tokens[1];
+        String protocol = tokens[2];
+
+        headerMap.put("method", method);
+        headerMap.put("url", url);
+        headerMap.put("protocol", protocol);
 
         // parsing url -> requestPath, queryString
         int index = url.indexOf("?");
-        String requestPath = index > -1 ? url.substring(0, index) : url;
-        String params = url.substring(index + 1);
-        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
+        if (index > -1) {
+            String requestPath = url.substring(0, index);
+            String params = url.substring(index + 1);
+            headerMap.put("requestPath", requestPath);
+            headerMap.put("params", params);
+        }
 
+        while (!"".equals(line)) {
+            // line null check 를 하지 않으면 무한 루프에 빠질 수 있음.
+            if (line == null) {
+                break;
+            }
+            line = br.readLine();
+            log.debug(line);
+
+            int _index = line.indexOf(":");
+            if (_index > -1) {
+                String key = line.substring(0, _index).trim();
+                String value = line.substring(_index + 1).trim();
+                headerMap.put(key, value);
+            }
+        }
+        return headerMap;
+    }
+
+    private Map<String, String> getBodyMap(BufferedReader br, int contentLength) throws IOException {
+
+        String data = IOUtils.readData(br, contentLength);
+        log.debug("data : " + data);
+        return HttpRequestUtils.parseQueryString(data);
+    }
+
+
+    private byte[] toBytes(Map<String, String> headerMap, Map<String, String> bodyMap) throws IOException {
+
+        String url = headerMap.get("url");
+        String method = headerMap.get("method");
+        String params = headerMap.get("params");
+        String requestPath = params != null ? headerMap.get("requestPath") : url;
+        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
 
         if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
             return Files.readAllBytes(new File("./webapp" + url).toPath());
@@ -93,14 +139,30 @@ public class RequestHandler extends Thread {
 
         if ("/user/create".equals(requestPath)) {
 
-            String userId = queryStringMap.get("userId");
-            String password = queryStringMap.get("password");
-            String name = queryStringMap.get("name");
-            String email = queryStringMap.get("email");
+            String userId = null;
+            String password = null;
+            String name = null;
+            String email = null;
 
-            User user = new User(userId, password, name, email);
-
-            log.debug(user.toString());
+            if ("get".equalsIgnoreCase(method)) {
+                if (queryStringMap != null) {
+                    userId = queryStringMap.get("userId");
+                    password = queryStringMap.get("password");
+                    name = queryStringMap.get("name");
+                    email = queryStringMap.get("email");
+                    User user = new User(userId, password, name, email);
+                    log.debug("Created User Info : " + user);
+                }
+            } else if ("post".equalsIgnoreCase(method)) {
+                if (bodyMap != null) {
+                    userId = bodyMap.get("userId");
+                    password = bodyMap.get("password");
+                    name = bodyMap.get("name");
+                    email = bodyMap.get("email");
+                    User user = new User(userId, password, name, email);
+                    log.debug("Created User Info : " + user);
+                }
+            }
 
             return Files.readAllBytes(new File("./webapp/index.html").toPath());
         }
