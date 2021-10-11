@@ -43,14 +43,66 @@ public class RequestHandler extends Thread {
             Map<String, String> bodyMap = this.getBodyMap(br, contentLength);
             log.debug("headerMap : " + headerMap);
             log.debug("bodyMap : " + bodyMap);
-            byte[] body = toBytes(headerMap, bodyMap);
 
-            response200Header(dos, body.length);
-            responseBody(dos, body);
+            response(dos, headerMap, bodyMap);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void response(DataOutputStream dos, Map<String, String> headerMap, Map<String, String> bodyMap) throws IOException {
+        String url = headerMap.get("url");
+        String method = headerMap.get("method");
+        String params = headerMap.get("params");
+        String requestPath = params != null ? headerMap.get("requestPath") : url;
+        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
+
+        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
+            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+            return;
+        }
+
+        if ("/user/create".equals(requestPath)) {
+
+            String userId = null;
+            String password = null;
+            String name = null;
+            String email = null;
+
+            if ("get".equalsIgnoreCase(method)) {
+                if (queryStringMap != null) {
+                    userId = queryStringMap.get("userId");
+                    password = queryStringMap.get("password");
+                    name = queryStringMap.get("name");
+                    email = queryStringMap.get("email");
+                    User user = new User(userId, password, name, email);
+                    log.debug("Created User Info : " + user);
+                }
+            } else if ("post".equalsIgnoreCase(method)) {
+                if (bodyMap != null) {
+                    userId = bodyMap.get("userId");
+                    password = bodyMap.get("password");
+                    name = bodyMap.get("name");
+                    email = bodyMap.get("email");
+                    User user = new User(userId, password, name, email);
+                    log.debug("Created User Info : " + user);
+                }
+            }
+
+            String tempUrl = "/index.html";
+            response302Header(dos, tempUrl);
+            responseBody(dos, null);
+            return;
+
+        }
+
+        byte[] defaultBody = "Hello Test World ".getBytes(StandardCharsets.UTF_8);
+        response200Header(dos, defaultBody.length);
+        responseBody(dos, defaultBody);
+
     }
 
     private void response200Header(DataOutputStream dos, int lengthOfBodyContent) {
@@ -64,8 +116,23 @@ public class RequestHandler extends Thread {
         }
     }
 
+    private void response302Header(DataOutputStream dos, String tempUrl) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Location: " + tempUrl + "\r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+
     private void responseBody(DataOutputStream dos, byte[] body) {
         try {
+            if (body == null) {
+                return;
+            }
             dos.write(body, 0, body.length);
             dos.flush();
         } catch (IOException e) {
@@ -124,50 +191,4 @@ public class RequestHandler extends Thread {
         return HttpRequestUtils.parseQueryString(data);
     }
 
-
-    private byte[] toBytes(Map<String, String> headerMap, Map<String, String> bodyMap) throws IOException {
-
-        String url = headerMap.get("url");
-        String method = headerMap.get("method");
-        String params = headerMap.get("params");
-        String requestPath = params != null ? headerMap.get("requestPath") : url;
-        Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
-
-        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
-            return Files.readAllBytes(new File("./webapp" + url).toPath());
-        }
-
-        if ("/user/create".equals(requestPath)) {
-
-            String userId = null;
-            String password = null;
-            String name = null;
-            String email = null;
-
-            if ("get".equalsIgnoreCase(method)) {
-                if (queryStringMap != null) {
-                    userId = queryStringMap.get("userId");
-                    password = queryStringMap.get("password");
-                    name = queryStringMap.get("name");
-                    email = queryStringMap.get("email");
-                    User user = new User(userId, password, name, email);
-                    log.debug("Created User Info : " + user);
-                }
-            } else if ("post".equalsIgnoreCase(method)) {
-                if (bodyMap != null) {
-                    userId = bodyMap.get("userId");
-                    password = bodyMap.get("password");
-                    name = bodyMap.get("name");
-                    email = bodyMap.get("email");
-                    User user = new User(userId, password, name, email);
-                    log.debug("Created User Info : " + user);
-                }
-            }
-
-            return Files.readAllBytes(new File("./webapp/index.html").toPath());
-        }
-
-        String defaultText = "Hello Test World ";
-        return defaultText.getBytes();
-    }
 }
