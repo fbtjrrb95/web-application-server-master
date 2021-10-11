@@ -31,10 +31,13 @@
 * 
 
 ### 요구사항 3 - post 방식으로 회원가입
-* 
+* post 로 요청할 때에도, body 도 queryString 방식으로 들어온다.
+* e.g. username=tjrrb&password=password
 
 ### 요구사항 4 - redirect 방식으로 이동
-* 
+* header 에 302 Found 로 저장하고, 
+* header 에 Location : {tempUrl} 저장하면 
+* 브라우저가 다시 tempUrl Get method 로 요청한다. 
 
 ### 요구사항 5 - cookie
 * 
