@@ -1,5 +1,6 @@
 package webserver;
 
+import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,10 @@ public class RequestHandler extends Thread {
                     name = queryStringMap.get("name");
                     email = queryStringMap.get("email");
                     User user = new User(userId, password, name, email);
-                    log.debug("Created User Info : " + user);
+                    DataBase.addUser(user);
+                    log.debug("Will Create User Info : " + user);
+                    log.debug("Created User Info : " + DataBase.findUserById(userId));
+
                 }
             } else if ("post".equalsIgnoreCase(method)) {
                 if (bodyMap != null) {
@@ -88,7 +92,9 @@ public class RequestHandler extends Thread {
                     name = bodyMap.get("name");
                     email = bodyMap.get("email");
                     User user = new User(userId, password, name, email);
-                    log.debug("Created User Info : " + user);
+                    DataBase.addUser(user);
+                    log.debug("Will Create User Info : " + user);
+                    log.debug("Created User Info : " + DataBase.findUserById(userId));
                 }
             }
 
