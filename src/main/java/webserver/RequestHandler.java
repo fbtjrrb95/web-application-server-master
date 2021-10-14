@@ -53,6 +53,7 @@ public class RequestHandler extends Thread {
     }
 
     private void response(DataOutputStream dos, Map<String, String> headerMap, Map<String, String> bodyMap) throws IOException {
+
         String url = headerMap.get("url");
         String method = headerMap.get("method");
         String params = headerMap.get("params");
@@ -60,12 +61,65 @@ public class RequestHandler extends Thread {
         Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
 
         if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
-            byte[] body = Files.readAllBytes(new File("./webapp" + url).toPath());
+            byte[] body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
             response200Header(dos, body.length);
             responseBody(dos, body);
             return;
         }
 
+        // 로그인 뷰 리턴
+        if ("/user/login.html".equals(requestPath) && "get".equalsIgnoreCase(method)) {
+            byte[] body = Files.readAllBytes(new File("./webapp/user/login.html").toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+            return;
+        }
+
+        // 로그인 실패 뷰 리턴
+        if ("/user/login_failed.html".equals(requestPath) && "get".equalsIgnoreCase(method)) {
+            byte[] body = Files.readAllBytes(new File("./webapp/user/login_failed.html").toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
+            return;
+        }
+
+        // 로그인 수행
+        if ("/user/login".equals(requestPath) && "post".equalsIgnoreCase(method)) {
+
+            String requestUserId = bodyMap.get("userId");
+            String requestPassword = bodyMap.get("password");
+
+            User userById = DataBase.findUserById(requestUserId);
+
+            Map<String, String> hashMap = new HashMap<>();
+
+            // login 실패 시, redirectUrl 설정
+            if (userById == null || !requestPassword.equals(userById.getPassword())) {
+
+                String redirectUrl = "/user/login_failed.html";
+                String setCookie = "logined=false";
+
+                hashMap.put("Location", redirectUrl);
+                hashMap.put("Set-Cookie", setCookie);
+
+                response302Header(dos, hashMap);
+                responseBody(dos, null);
+                return;
+            }
+
+            // login 성공, redirectUrl 설정
+            String redirectUrl = "/index.html";
+            String setCookie = "logined=true";
+
+            hashMap.put("Location", redirectUrl);
+            hashMap.put("Set-Cookie", setCookie);
+
+            response302Header(dos, hashMap);
+            responseBody(dos, null);
+            return;
+        }
+
+        // 회원 가입
         if ("/user/create".equals(requestPath)) {
 
             String userId = null;
@@ -125,8 +179,20 @@ public class RequestHandler extends Thread {
     private void response302Header(DataOutputStream dos, String tempUrl) {
         try {
             dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
-            dos.writeBytes("Location: " + tempUrl + "\r\n");
             dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            dos.writeBytes(String.format("Location: %s\r\n", tempUrl));
+            dos.writeBytes("\r\n");
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+    private void response302Header(DataOutputStream dos, Map<String,String> hashMap) {
+        try {
+            dos.writeBytes("HTTP/1.1 302 FOUND \r\n");
+            dos.writeBytes("Content-Type: text/html;charset=utf-8\r\n");
+            for (String key : hashMap.keySet()) {
+                dos.writeBytes(String.format("%s: %s\r\n", key, hashMap.get(key)));
+            }
             dos.writeBytes("\r\n");
         } catch (IOException e) {
             log.error(e.getMessage());
