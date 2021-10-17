@@ -57,8 +57,11 @@ public class RequestHandler extends Thread {
         String url = headerMap.get("url");
         String method = headerMap.get("method");
         String params = headerMap.get("params");
+        String cookies = headerMap.get("Cookie");
+
         String requestPath = params != null ? headerMap.get("requestPath") : url;
         Map<String, String> queryStringMap = HttpRequestUtils.parseQueryString(params);
+        Map<String, String> cookiesMap = HttpRequestUtils.parseCookies(cookies);
 
         if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
             byte[] body = Files.readAllBytes(new File("./webapp" + requestPath).toPath());
@@ -155,6 +158,25 @@ public class RequestHandler extends Thread {
             String tempUrl = "/index.html";
             response302Header(dos, tempUrl);
             responseBody(dos, null);
+            return;
+
+        }
+
+        // 유저 리스트
+        if ("/user/list".equals(requestPath)) {
+
+            boolean isLogined = Boolean.parseBoolean(cookiesMap.get("logined"));
+
+            // 로그인이 되어 있으면 유저 리스트를 반환
+            // 되어있지 않으면 초기화면 반환
+            String pathName = "./webapp/user/list.html";
+            if (!isLogined) {
+                pathName = "./webapp/index.html";
+            }
+
+            byte[] body = Files.readAllBytes(new File(pathName).toPath());
+            response200Header(dos, body.length);
+            responseBody(dos, body);
             return;
 
         }

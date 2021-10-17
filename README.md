@@ -45,7 +45,9 @@
 * 아무 속성을 주지 않았을 때, 이 쿠키는 한 세션에서만 유지된다. 
 
 ### 요구사항 6 - 사용자 목록 출력하기
-* 
+* Boolean.parseBoolean 은 JsonParse 처럼 에러를 던지지 않는다. 
+  * 내부 구현을 확인해보면 "true".equalsIgnore(arg) 로 되어 있다. 
+* http request cookies는 "logined=true; jsessionId=example" 이런 형식을 가진다.
 
 
 ### 요구사항 7 - stylesheet 적용
