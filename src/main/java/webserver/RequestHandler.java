@@ -33,7 +33,7 @@ public class RequestHandler extends Thread {
             DataOutputStream dos = new DataOutputStream(out);
             BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
 
-            Map<String, String> headerMap = this.getHeaderMap(br);
+            Map<String, String> headerMap = getHeaderMap(br);
 
             String contentLengthString = headerMap.get("Content-Length");
             int contentLength = 0;
@@ -41,7 +41,7 @@ public class RequestHandler extends Thread {
                 contentLength = Integer.parseInt(contentLengthString);
             }
 
-            Map<String, String> bodyMap = this.getBodyMap(br, contentLength);
+            Map<String, String> bodyMap = getBodyMap(br, contentLength);
             log.debug("headerMap : " + headerMap);
             log.debug("bodyMap : " + bodyMap);
 
@@ -257,7 +257,7 @@ public class RequestHandler extends Thread {
         Map<String, String> headerMap = new HashMap<>();
 
         String line = br.readLine();
-        log.debug(line);
+        log.debug("request line : {}", line);
 
         String[] tokens = line.split(" ");
 
@@ -279,12 +279,8 @@ public class RequestHandler extends Thread {
         }
 
         while (!"".equals(line)) {
-            // line null check 를 하지 않으면 무한 루프에 빠질 수 있음.
-            if (line == null) {
-                break;
-            }
             line = br.readLine();
-            log.debug(line);
+            log.debug("header : {}", line);
 
             int _index = line.indexOf(":");
             if (_index > -1) {
