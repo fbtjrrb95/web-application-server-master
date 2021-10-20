@@ -26,6 +26,15 @@
   * responseBody 참고
   * response200Header 참고
   
+* request Line
+  * 클라이언트에서 서버로 보내는 요청의 첫 번째 라인
+  * e.g. GET /index.html HTTP/1.1
+* status Line
+  * 서버에서 클라이언트로 보내는 응답의 첫 번째 라인
+  * e.g. HTTP/1.1 200 OK
+* 서버는 웹 페이지를 구성하는 모든 자원을 한번에 응답으로 보내지 않음
+  * 여러 번의 요청과 응답을 주고 받게 됨.
+  
 
 ### 요구사항 2 - get 방식으로 회원가입
 * 
