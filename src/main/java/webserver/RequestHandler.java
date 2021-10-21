@@ -129,41 +129,22 @@ public class RequestHandler extends Thread {
             return;
         }
 
-        // 회원 가입
-        if ("/user/create".equals(requestPath)) {
+        // post 으로 회원 가입
+        if("/user/create".equals(requestPath) && "post".equalsIgnoreCase(method)) {
 
-            String userId = null;
-            String password = null;
-            String name = null;
-            String email = null;
+            String userId = bodyMap.get("userId");
+            String password = bodyMap.get("password");
+            String name = bodyMap.get("name");
+            String email = bodyMap.get("email");
 
-            if ("get".equalsIgnoreCase(method)) {
-                if (queryStringMap != null) {
-                    userId = queryStringMap.get("userId");
-                    password = queryStringMap.get("password");
-                    name = queryStringMap.get("name");
-                    email = queryStringMap.get("email");
-                    User user = new User(userId, password, name, email);
-                    DataBase.addUser(user);
-                    log.debug("Will Create User Info : " + user);
-                    log.debug("Created User Info : " + DataBase.findUserById(userId));
+            User user = new User(userId, password, name, email);
+            log.debug("User : {} ", DataBase.findUserById(userId));
 
-                }
-            } else if ("post".equalsIgnoreCase(method)) {
-                if (bodyMap != null) {
-                    userId = bodyMap.get("userId");
-                    password = bodyMap.get("password");
-                    name = bodyMap.get("name");
-                    email = bodyMap.get("email");
-                    User user = new User(userId, password, name, email);
-                    DataBase.addUser(user);
-                    log.debug("Will Create User Info : " + user);
-                    log.debug("Created User Info : " + DataBase.findUserById(userId));
-                }
-            }
+            DataBase.addUser(user);
 
-            String tempUrl = "/index.html";
-            response302Header(dos, tempUrl);
+            String home = "/index.html";
+
+            response302Header(dos, home);
             responseBody(dos, null);
             return;
 
