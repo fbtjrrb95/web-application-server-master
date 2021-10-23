@@ -11,6 +11,7 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -118,20 +119,39 @@ public class RequestHandler extends Thread {
         }
 
         // 유저 리스트
-        if ("/user/list".equals(requestPath)) {
+        if ("/user/list".equals(requestPath) && "get".equalsIgnoreCase(method)) {
 
             boolean isLogined = Boolean.parseBoolean(cookiesMap.get("logined"));
 
             // 로그인이 되어 있으면 유저 리스트를 반환
-            // 되어있지 않으면 초기화면 반환
-            String pathName;
+            // 되어있지 않으면 로그인화면 반환
             if (!isLogined) {
-                pathName = "./webapp/index.html";
-            } else {
-                pathName = "./webapp/user/list.html";
+                responseResource(dos, "/user/login.html");
+                return;
             }
 
-            responseResource(dos, pathName);
+            Collection<User> users = DataBase.findAll();
+            StringBuilder stringBuilder = new StringBuilder();
+
+            stringBuilder.append("<table border='1'>");
+            stringBuilder.append("<tr>");
+            stringBuilder.append("<td>userId</td>");
+            stringBuilder.append("<td>userName</td>");
+            stringBuilder.append("<td>userEmail</td>");
+            stringBuilder.append("</tr>");
+
+            users.stream().forEach(user -> {
+                stringBuilder.append("<tr>");
+                stringBuilder.append(String.format("<td>%s</td>", user.getUserId()));
+                stringBuilder.append(String.format("<td>%s</td>", user.getName()));
+                stringBuilder.append(String.format("<td>%s</td>", user.getEmail()));
+                stringBuilder.append("</tr>");
+            });
+            stringBuilder.append("</table>");
+
+            byte[] body = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
+            response200Header(dos, body.length);
+            responseBody(dos, body);
             return;
 
         }
