@@ -57,7 +57,11 @@
 * Boolean.parseBoolean 은 JsonParse 처럼 에러를 던지지 않는다. 
   * 내부 구현을 확인해보면 "true".equalsIgnore(arg) 로 되어 있다. 
 * http request cookies는 "logined=true; jsessionId=example" 이런 형식을 가진다.
-
+* stringbuilder 로 html 형식의 string 을 생성 후 byte 변환하여 dataOutStream 에 write 하는 방식으로 유저 리스트를 반환 할 수 있다. 
+* dataOutputStream
+  * 추상 클래스인 outputStream 을 추가 구현한 클래스
+  * 바이트 타입의 데이터를 쓸 수 있음. (기본적으로 outputStream 클래스의 Write 함수를 구현함.)
+  * 바이트 타입 이외의 자바 타입도 쓸 수 있다. (e.g. writeBoolean, writeUTF, ...)
 
 ### 요구사항 7 - stylesheet 적용
-*
+* 
