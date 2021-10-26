@@ -2,19 +2,16 @@ package service;
 
 import org.junit.Test;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
+import java.io.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class HttpRequestTest {
 
-    private String testDirectory = "./src/test/resources/";
+    private final String testDirectory = "./src/test/resources/";
 
     @Test
-    public void request_GET() throws FileNotFoundException {
+    public void request_GET() throws IOException {
         InputStream inputStream = new FileInputStream(new File(String.format("%sHttp_GET.txt", testDirectory)));
 
         HttpRequest httpRequest = new HttpRequest(inputStream);
@@ -27,7 +24,7 @@ public class HttpRequestTest {
     }
 
     @Test
-    public void request_POST() throws FileNotFoundException {
+    public void request_POST() throws IOException {
         InputStream inputStream = new FileInputStream(new File(String.format("%sHttp_POST.txt", testDirectory)));
 
         HttpRequest httpRequest = new HttpRequest(inputStream);
