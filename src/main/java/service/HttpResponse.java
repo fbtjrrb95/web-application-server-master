@@ -12,4 +12,7 @@ public class HttpResponse {
 
     public void sendRedirect(String s) {
     }
+
+    public void addHeader(String s, String s1) {
+    }
 }
