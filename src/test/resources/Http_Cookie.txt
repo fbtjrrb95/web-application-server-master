@@ -1,0 +1,2 @@
+Set-Cookie: logined=true
+Location: /index.html
