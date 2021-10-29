@@ -7,6 +7,7 @@ import javax.print.attribute.HashPrintJobAttributeSet;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,36 +26,32 @@ public class HttpResponse {
     }
 
     public void sendRedirect(String s) {
-        responseHeaderMap.put("Location", s);
-    }
-
-    public void addHeader(String key, String value) {
-        responseHeaderMap.put(key, value);
-    }
-
-    public void forward(String s) {
-
-    }
-
-    public void response200Header(int i) {
-        statusLine = String.format("%s 200 OK", protocol);
-        responseHeaderMap.put("Content-Type", "text/html;charset=utf-8");
-        responseHeaderMap.put("Content-Length", String.valueOf(i));
-    }
-
-    public void responseBody(byte[] bytes) {
-
-    }
-
-    public void processHeaders() {
         try {
-            dataOutputStream.writeBytes(String.format("%s\r\n", statusLine));
-            for (Map.Entry<String, String> e : responseHeaderMap.entrySet()) {
-                dataOutputStream.writeBytes(String.format("%s: %s\r\n", e.getKey(), e.getValue()));
-            }
-            dataOutputStream.writeBytes("\r\n");
+            dataOutputStream.writeBytes(String.format("Location: %s\r\n", s));
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
+
+    public void addHeader(String key, String value) {
+        try {
+            dataOutputStream.writeBytes(String.format("%s: %s\r\n", key, value));
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
+    public void forward(String s) {
+        try {
+            byte[] bytes = s.getBytes(StandardCharsets.UTF_8);
+            if (bytes == null) {
+                return;
+            }
+            dataOutputStream.write(bytes, 0, bytes.length);
+            dataOutputStream.flush();
+        } catch (IOException e) {
+            log.error(e.getMessage());
+        }
+    }
+
 }
