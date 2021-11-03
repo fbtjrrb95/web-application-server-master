@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
-import webserver.RequestHandler;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,13 +16,12 @@ import java.util.Map;
 public class HttpRequest {
 
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
-    private Map<String, String> headerMap;
+    private final Map<String, String> headerMap;
     private Map<String, String> queryParametersMap;
-    private Map<String, String> bodyParametersMap;
+    private final Map<String, String> bodyParametersMap;
 
-    private String method;
-    private String url;
-    private String requestPath;
+    private final String method;
+    private final String requestPath;
 
     public HttpRequest(InputStream inputStream) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
@@ -31,12 +29,13 @@ public class HttpRequest {
 
         String[] tokens = line.split(" ");
         method = tokens[0];
-        url = tokens[1];
+        String url = tokens[1];
 
         int index = url.indexOf("?");
         if (index > -1) {
             requestPath = url.substring(0, index);
             queryParametersMap = HttpRequestUtils.parseQueryString(url.substring(index + 1));
+            log.debug("queryParametersMap : {} ", queryParametersMap);
         } else {
             requestPath = url;
         }
@@ -50,7 +49,7 @@ public class HttpRequest {
         }
 
         bodyParametersMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
-
+        log.debug("bodyParametersMap : {} ", bodyParametersMap);
     }
 
     private Map<String, String> getHeaderMap(BufferedReader br) throws IOException {
