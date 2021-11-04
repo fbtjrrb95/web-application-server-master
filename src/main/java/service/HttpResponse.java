@@ -1,6 +1,5 @@
 package service;
 
-import com.google.common.collect.ImmutableMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,20 +8,13 @@ import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.Map;
 import java.util.Optional;
 
 public class HttpResponse {
 
     private static final Logger log = LoggerFactory.getLogger(HttpResponse.class);
 
-    private final String protocol = "HTTP/1.1";
     private final DataOutputStream dataOutputStream;
-
-    private final Map<Integer, String> statusLineMap = ImmutableMap.of(
-            200, String.format("%s 200 OK", protocol),
-            302, String.format("%s 302 Redirect", protocol)
-    );
 
     public HttpResponse(OutputStream outputStream) {
         dataOutputStream = new DataOutputStream(outputStream);
@@ -39,14 +31,6 @@ public class HttpResponse {
     public void addHeader(String key, String value) {
         try {
             dataOutputStream.writeBytes(String.format("%s: %s\r\n", key, value));
-        } catch (IOException e) {
-            log.error(e.getMessage());
-        }
-    }
-
-    public void addStatusLine(int statusCode) {
-        try {
-            dataOutputStream.writeBytes(statusLineMap.get(statusCode));
         } catch (IOException e) {
             log.error(e.getMessage());
         }
