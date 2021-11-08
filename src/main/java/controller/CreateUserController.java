@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import service.HttpRequest;
 import service.HttpResponse;
 
-public class CreateUserController extends AbstractController {
+public class CreateUserController extends AbstractPostController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override
@@ -23,9 +23,5 @@ public class CreateUserController extends AbstractController {
         DataBase.addUser(user);
 
         httpResponse.response302Header("/index.html");
-    }
-
-    @Override
-    public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) {
     }
 }
