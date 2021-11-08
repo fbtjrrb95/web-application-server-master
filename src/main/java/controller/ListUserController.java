@@ -19,22 +19,25 @@ public class ListUserController extends AbstractGetController {
 
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-        String cookies = httpRequest.getHeader("Cookie");
-        Map<String, String> cookiesMap = HttpRequestUtils.parseCookies(cookies);
-
-        log.debug("cookies : {}", cookies);
-
-        boolean isLogined = Boolean.parseBoolean(cookiesMap.get("logined"));
 
         // 로그인이 되어 있으면 유저 리스트를 반환
         // 되어있지 않으면 로그인화면 반환
-        if (!isLogined) {
+        if (!isLogined(httpRequest)) {
             httpResponse.responseResource("/user/login.html");
             return;
         }
 
         byte[] body = getUserList().getBytes(StandardCharsets.UTF_8);
         httpResponse.responseResource(body);
+    }
+
+    private boolean isLogined(HttpRequest httpRequest) {
+        String cookies = httpRequest.getHeader("Cookie");
+        Map<String, String> cookiesMap = HttpRequestUtils.parseCookies(cookies);
+
+        log.debug("cookies : {}", cookies);
+
+        return Boolean.parseBoolean(cookiesMap.get("logined"));
     }
 
     private String getUserList() {
