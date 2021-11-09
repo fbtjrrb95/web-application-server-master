@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public abstract class AbstractGetController implements Controller{
     @Override
-    public void service(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         doGet(httpRequest, httpResponse);
     }
 
