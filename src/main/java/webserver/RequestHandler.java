@@ -54,7 +54,7 @@ public class RequestHandler extends Thread {
 
         log.debug("cookies : {}, requestPath : {}", cookies, requestPath);
 
-        if(requestPath.endsWith(".css")) {
+        if (requestPath.endsWith(".css")) {
             httpResponse.responseCssResource(requestPath);
             return;
         }
@@ -90,7 +90,7 @@ public class RequestHandler extends Thread {
         }
 
         // post 으로 회원 가입
-        if("/user/create".equals(requestPath)) {
+        if ("/user/create".equals(requestPath)) {
 
             String userId = httpRequest.getParameter("userId");
             String password = httpRequest.getParameter("password");
