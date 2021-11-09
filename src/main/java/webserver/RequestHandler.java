@@ -54,18 +54,7 @@ public class RequestHandler extends Thread {
 
         log.debug("cookies : {}, requestPath : {}", cookies, requestPath);
 
-        if (requestPath.endsWith(".css")) {
-            httpResponse.responseCssResource(requestPath);
-            return;
-        }
-
-        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
-            httpResponse.responseResource(requestPath);
-            return;
-        }
-
-        // 로그인 뷰 리턴
-        if ("/user/login.html".equals(requestPath)) {
+        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath) || "/user/login.html".equals(requestPath) || requestPath.endsWith(".css")) {
             httpResponse.responseResource(requestPath);
             return;
         }
