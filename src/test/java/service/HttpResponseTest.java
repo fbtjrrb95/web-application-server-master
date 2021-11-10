@@ -10,13 +10,6 @@ public class HttpResponseTest {
 
     private String testDirectory = "./src/test/resources/";
 
-//    @Test
-//    public void responseForward() throws IOException {
-//        // Http_Forward.txt 결과는 응답 body에 index.html 이 포함되어 있어야 한다.
-//        HttpResponse httpResponse = new HttpResponse(createOutputStream("Http_Forward.txt"));
-//        httpResponse.responseResource("/index.html");
-//    }
-
     @Test
     public void responseRedirect() throws FileNotFoundException {
         // Http_Redirect.txt 결과는 응답 header 에
