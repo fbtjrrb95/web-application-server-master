@@ -54,10 +54,6 @@ public class HttpResponse {
 
     public void responseResource(String url) throws IOException {
 
-        if (url.isEmpty()) {
-            throw new RuntimeException("url cannot be empty");
-        }
-
         byte[] body = Files.readAllBytes(new File(String.format("./webapp%s", url)).toPath());
 
         // TODO: refactoring if/else phrase
