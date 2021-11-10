@@ -1,5 +1,7 @@
 package webserver;
 
+import controller.Controller;
+import controller.ControllerFactory;
 import db.DataBase;
 import model.User;
 import org.slf4j.Logger;
@@ -38,115 +40,13 @@ public class RequestHandler extends Thread {
             HttpRequest httpRequest = new HttpRequest(inputStream);
             HttpResponse httpResponse = new HttpResponse(dataOutputStream);
 
-            response(httpRequest, httpResponse);
+            String requestPath = httpRequest.getPath();
+
+            Controller controller = ControllerFactory.getInstance(requestPath);
+            controller.service(httpRequest, httpResponse);
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
-
-    private void response(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
-
-        String cookies = httpRequest.getHeader("Cookie");
-        String requestPath = httpRequest.getPath();
-
-        Map<String, String> cookiesMap = HttpRequestUtils.parseCookies(cookies);
-
-        log.debug("cookies : {}, requestPath : {}", cookies, requestPath);
-
-        if(requestPath.endsWith(".css")) {
-            httpResponse.responseCssResource(requestPath);
-            return;
-        }
-
-        if ("/index.html".equals(requestPath) || "/user/form.html".equals(requestPath)) {
-            httpResponse.responseResource(requestPath);
-            return;
-        }
-
-        // 로그인 뷰 리턴
-        if ("/user/login.html".equals(requestPath)) {
-            httpResponse.responseResource(requestPath);
-            return;
-        }
-
-        // 로그인 수행
-        if ("/user/login".equals(requestPath)) {
-
-            String requestUserId = httpRequest.getParameter("userId");
-            String requestPassword = httpRequest.getParameter("password");
-
-            User userById = DataBase.findUserById(requestUserId);
-
-            // login 실패 시, redirectUrl 설정
-            if (userById == null || !requestPassword.equals(userById.getPassword())) {
-                httpResponse.responseResource("/user/login_failed.html");
-                return;
-            }
-
-            // login 성공, redirectUrl 설정
-            httpResponse.response302LoginSuccessHeader();
-            return;
-        }
-
-        // post 으로 회원 가입
-        if("/user/create".equals(requestPath)) {
-
-            String userId = httpRequest.getParameter("userId");
-            String password = httpRequest.getParameter("password");
-            String name = httpRequest.getParameter("name");
-            String email = httpRequest.getParameter("email");
-
-            User user = new User(userId, password, name, email);
-            log.debug("User : {} ", DataBase.findUserById(userId));
-
-            DataBase.addUser(user);
-
-            httpResponse.response302Header("/index.html");
-            return;
-
-        }
-
-        // 유저 리스트
-        if ("/user/list".equals(requestPath)) {
-
-            boolean isLogined = Boolean.parseBoolean(cookiesMap.get("logined"));
-
-            // 로그인이 되어 있으면 유저 리스트를 반환
-            // 되어있지 않으면 로그인화면 반환
-            if (!isLogined) {
-                httpResponse.responseResource("/user/login.html");
-                return;
-            }
-
-            Collection<User> users = DataBase.findAll();
-            StringBuilder stringBuilder = new StringBuilder();
-
-            stringBuilder.append("<table border='1'>");
-            stringBuilder.append("<tr>");
-            stringBuilder.append("<td>userId</td>");
-            stringBuilder.append("<td>userName</td>");
-            stringBuilder.append("<td>userEmail</td>");
-            stringBuilder.append("</tr>");
-
-            users.forEach(user -> {
-                stringBuilder.append("<tr>");
-                stringBuilder.append(String.format("<td>%s</td>", user.getUserId()));
-                stringBuilder.append(String.format("<td>%s</td>", user.getName()));
-                stringBuilder.append(String.format("<td>%s</td>", user.getEmail()));
-                stringBuilder.append("</tr>");
-            });
-            stringBuilder.append("</table>");
-
-            byte[] body = stringBuilder.toString().getBytes(StandardCharsets.UTF_8);
-            httpResponse.responseResource(body);
-            return;
-
-        }
-
-        byte[] body = "Hello Test World ".getBytes(StandardCharsets.UTF_8);
-        httpResponse.responseResource(body);
-
-    }
-
 }

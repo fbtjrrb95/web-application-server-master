@@ -37,11 +37,16 @@ public class HttpResponse {
     }
 
     public void responseResource(String url) throws IOException {
-        String urlOrDefault = Optional.ofNullable(url)
-                .filter(u -> !u.isEmpty())
-                .orElse("/index.html");
-        byte[] body = Files.readAllBytes(new File("./webapp" + urlOrDefault).toPath());
-        response200Header(body.length);
+
+        byte[] body = Files.readAllBytes(new File(String.format("./webapp%s", url)).toPath());
+
+        // TODO: refactoring if/else phrase
+        if (url.endsWith(".css")) {
+            response200CssHeader(body.length);
+        } else {
+            response200Header(body.length);
+        }
+
         responseBody(body);
     }
 
@@ -55,7 +60,6 @@ public class HttpResponse {
         response200CssHeader(body.length);
         responseBody( body);
     }
-
 
     private void response200Header(int lengthOfBodyContent) {
         try {
