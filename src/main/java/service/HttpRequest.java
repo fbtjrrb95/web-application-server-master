@@ -43,7 +43,6 @@ public class HttpRequest {
     private void buildParamsMap(BufferedReader br) throws IOException {
         if ("POST".equals(getMethod())) {
             int contentLength = Integer.parseInt(headersMap.get("Content-Length"));
-            ;
             paramsMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
         } else {
             paramsMap = requestLine.getParams();
