@@ -19,9 +19,7 @@ public class HttpRequest {
 
     private Map<String, String> headersMap = new HashMap<>();
     private Map<String, String> paramsMap = new HashMap<>();
-
-    private String method;
-    private String requestPath;
+    private RequestLine requestLine;
 
     public HttpRequest(InputStream inputStream) {
         try {
@@ -30,7 +28,9 @@ public class HttpRequest {
             if (line == null) {
                 return;
             }
-//            processRequestLine(line);
+
+            requestLine = new RequestLine(line);
+
             buildHeadersMap(br);
             buildParamsMap(br);
 
@@ -41,11 +41,14 @@ public class HttpRequest {
     }
 
     private void buildParamsMap(BufferedReader br) throws IOException {
-        if ("POST".equals(method)) {
-            int contentLength = Integer.parseInt(headersMap.get("Content-Length"));;
+        if ("POST".equals(getMethod())) {
+            int contentLength = Integer.parseInt(headersMap.get("Content-Length"));
+            ;
             paramsMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
-            log.debug("paramsMap : {} ", paramsMap);
+        } else {
+            paramsMap = requestLine.getParams();
         }
+        log.debug("paramsMap : {} ", paramsMap);
     }
 
     private void buildHeadersMap(BufferedReader br) throws IOException {
@@ -60,11 +63,11 @@ public class HttpRequest {
     }
 
     public String getMethod() {
-        return method;
+        return requestLine.getMethod();
     }
 
     public String getPath() {
-        return requestPath;
+        return requestLine.getPath();
     }
 
     public String getHeader(String key) {
