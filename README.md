@@ -66,4 +66,8 @@
   * 바이트 타입 이외의 자바 타입도 쓸 수 있다. (e.g. writeBoolean, writeUTF, ...)
 
 ### 요구사항 7 - stylesheet 적용
-* 
+
+
+### 요구사항 8 - refactoring code
+* private 메소드의 복잡도가 높아 별도의 테스트가 필요한 데 테스트하기 힘들다면 어딘가 리팩토링할 부분이 있겠다. 
+  * 여기서는 RequestLine class 를 별도로 분리해서 해결했다.  
