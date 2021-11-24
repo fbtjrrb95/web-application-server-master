@@ -14,16 +14,16 @@ public class RequestLineTest {
     public void create_method() {
 
         RequestLine requestLine = new RequestLine("GET /index.html HTTP/1.1");
-        assertThat(requestLine.getMethod()).isEqualTo("GET");
+        assertThat(requestLine.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(requestLine.getPath()).isEqualTo("/index.html");
 
     }
 
     @Test
-    public void create_path_and_params() {
+    public void create_path_and_params_get() {
         RequestLine requestLine = new RequestLine("GET /user/create?userId=javajigi&password=pass HTTP/1.1");
 
-        assertThat(requestLine.getMethod()).isEqualTo("GET");
+        assertThat(requestLine.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(requestLine.getPath()).isEqualTo("/user/create");
 
         Map<String, String> params = requestLine.getParams();

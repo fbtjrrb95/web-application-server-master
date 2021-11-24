@@ -17,7 +17,7 @@ public class HttpRequest {
 
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
 
-    private Map<String, String> headersMap = new HashMap<>();
+    private final Map<String, String> headersMap = new HashMap<>();
     private Map<String, String> paramsMap = new HashMap<>();
     private RequestLine requestLine;
 
@@ -34,14 +34,14 @@ public class HttpRequest {
             buildHeadersMap(br);
             buildParamsMap(br);
 
-
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
     private void buildParamsMap(BufferedReader br) throws IOException {
-        if ("POST".equals(getMethod())) {
+
+        if (getMethod().isPost()) {
             int contentLength = Integer.parseInt(headersMap.get("Content-Length"));
             paramsMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
         } else {
@@ -53,6 +53,10 @@ public class HttpRequest {
     private void buildHeadersMap(BufferedReader br) throws IOException {
         String line = br.readLine();
         while (!"".equals(line)) {
+            if (line == null) {
+                break;
+            }
+            
             log.debug("header : {}", line);
             String[] tokens = line.split(":");
             headersMap.put(tokens[0].trim(), tokens[1].trim());
@@ -61,7 +65,7 @@ public class HttpRequest {
         }
     }
 
-    public String getMethod() {
+    public HttpMethod getMethod() {
         return requestLine.getMethod();
     }
 
