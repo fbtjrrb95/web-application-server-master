@@ -19,6 +19,7 @@ public class HttpRequest {
 
     private final Map<String, String> headersMap = new HashMap<>();
     private Map<String, String> paramsMap = new HashMap<>();
+    private Map<String, String> cookiesMap;
     private RequestLine requestLine;
 
     public HttpRequest(InputStream inputStream) {
@@ -33,10 +34,17 @@ public class HttpRequest {
 
             buildHeadersMap(br);
             buildParamsMap(br);
+            buildCookiesMap();
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
+    }
+
+    private void buildCookiesMap() {
+        String cookies = getHeader("Cookie");
+        cookiesMap = HttpRequestUtils.parseCookies(cookies);
+        log.debug("cookies : {}", cookies);
     }
 
     private void buildParamsMap(BufferedReader br) throws IOException {
@@ -80,4 +88,6 @@ public class HttpRequest {
     public String getParameter(String key) {
         return paramsMap.get(key);
     }
+
+    public String getCookie(String key) { return cookiesMap.get(key); }
 }

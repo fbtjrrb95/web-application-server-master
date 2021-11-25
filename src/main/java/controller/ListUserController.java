@@ -32,12 +32,7 @@ public class ListUserController extends AbstractGetController {
     }
 
     private boolean isLogined(HttpRequest httpRequest) {
-        String cookies = httpRequest.getHeader("Cookie");
-        Map<String, String> cookiesMap = HttpRequestUtils.parseCookies(cookies);
-
-        log.debug("cookies : {}", cookies);
-
-        return Boolean.parseBoolean(cookiesMap.get("logined"));
+        return Boolean.parseBoolean(httpRequest.getCookie("logined"));
     }
 
     private String getUserList() {
