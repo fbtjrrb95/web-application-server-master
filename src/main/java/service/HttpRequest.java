@@ -16,83 +16,78 @@ import java.util.Map;
 public class HttpRequest {
 
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
-    private final Map<String, String> headerMap;
-    private Map<String, String> queryParametersMap;
-    private final Map<String, String> bodyParametersMap;
 
-    private final String method;
-    private final String requestPath;
+    private final Map<String, String> headersMap = new HashMap<>();
+    private Map<String, String> paramsMap = new HashMap<>();
+    private Map<String, String> cookiesMap;
+    private RequestLine requestLine;
 
-    public HttpRequest(InputStream inputStream) throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-        String line = br.readLine();
+    public HttpRequest(InputStream inputStream) {
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            String line = br.readLine();
+            if (line == null) {
+                return;
+            }
 
-        String[] tokens = line.split(" ");
-        method = tokens[0];
-        String url = tokens[1];
+            requestLine = new RequestLine(line);
 
-        int index = url.indexOf("?");
-        if (index > -1) {
-            requestPath = url.substring(0, index);
-            queryParametersMap = HttpRequestUtils.parseQueryString(url.substring(index + 1));
-            log.debug("queryParametersMap : {} ", queryParametersMap);
-        } else {
-            requestPath = url;
+            buildHeadersMap(br);
+            buildParamsMap(br);
+            buildCookiesMap();
+
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
-
-        headerMap = getHeaderMap(br);
-
-        int contentLength = 0;
-        String valueOfContentLength = headerMap.get("Content-Length");
-        if (valueOfContentLength != null && !valueOfContentLength.isEmpty()) {
-            contentLength = Integer.parseInt(valueOfContentLength);
-        }
-
-        bodyParametersMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
-        log.debug("bodyParametersMap : {} ", bodyParametersMap);
     }
 
-    private Map<String, String> getHeaderMap(BufferedReader br) throws IOException {
-        Map<String, String> _headerMap = new HashMap<>();
-        String line = null;
+    private void buildCookiesMap() {
+        String cookies = getHeader("Cookie");
+        cookiesMap = HttpRequestUtils.parseCookies(cookies);
+        log.debug("cookies : {}", cookies);
+    }
+
+    private void buildParamsMap(BufferedReader br) throws IOException {
+
+        if (getMethod().isPost()) {
+            int contentLength = Integer.parseInt(headersMap.get("Content-Length"));
+            paramsMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
+        } else {
+            paramsMap = requestLine.getParams();
+        }
+        log.debug("paramsMap : {} ", paramsMap);
+    }
+
+    private void buildHeadersMap(BufferedReader br) throws IOException {
+        String line = br.readLine();
         while (!"".equals(line)) {
-            line = br.readLine();
             if (line == null) {
                 break;
             }
+            
             log.debug("header : {}", line);
+            String[] tokens = line.split(":");
+            headersMap.put(tokens[0].trim(), tokens[1].trim());
 
-            int _index = line.indexOf(":");
-            if (_index > -1) {
-                String key = line.substring(0, _index).trim();
-                String value = line.substring(_index + 1).trim();
-                _headerMap.put(key, value);
-            }
+            line = br.readLine();
         }
-        return _headerMap;
     }
 
-    public String getMethod() {
-        return method;
+    public HttpMethod getMethod() {
+        return requestLine.getMethod();
     }
 
     public String getPath() {
-        return requestPath;
+        return requestLine.getPath();
     }
 
     public String getHeader(String key) {
-        return headerMap.get(key);
+        return headersMap.get(key);
     }
 
     public String getParameter(String key) {
-        if (method.equals("GET")) {
-            return queryParametersMap.get(key);
-        }
-
-        if (method.equals("POST")) {
-            return bodyParametersMap.get(key);
-        }
-
-        return "";
+        return paramsMap.get(key);
     }
+
+    public String getCookie(String key) { return cookiesMap.get(key); }
 }
