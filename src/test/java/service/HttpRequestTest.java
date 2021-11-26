@@ -12,11 +12,11 @@ public class HttpRequestTest {
 
     @Test
     public void request_GET() throws IOException {
-        InputStream inputStream = new FileInputStream(new File(String.format("%sHttp_GET.txt", testDirectory)));
+        InputStream inputStream = new FileInputStream(String.format("%sHttp_GET.txt", testDirectory));
 
         HttpRequest httpRequest = new HttpRequest(inputStream);
 
-        assertThat(httpRequest.getMethod()).isEqualTo("GET");
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.GET);
         assertThat(httpRequest.getPath()).isEqualTo("/user/create");
         assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
@@ -25,11 +25,11 @@ public class HttpRequestTest {
 
     @Test
     public void request_POST() throws IOException {
-        InputStream inputStream = new FileInputStream(new File(String.format("%sHttp_POST.txt", testDirectory)));
+        InputStream inputStream = new FileInputStream(String.format("%sHttp_POST.txt", testDirectory));
 
         HttpRequest httpRequest = new HttpRequest(inputStream);
 
-        assertThat(httpRequest.getMethod()).isEqualTo("POST");
+        assertThat(httpRequest.getMethod()).isEqualTo(HttpMethod.POST);
         assertThat(httpRequest.getPath()).isEqualTo("/user/create");
         assertThat(httpRequest.getHeader("Connection")).isEqualTo("keep-alive");
         assertThat(httpRequest.getParameter("userId")).isEqualTo("javajigi");
