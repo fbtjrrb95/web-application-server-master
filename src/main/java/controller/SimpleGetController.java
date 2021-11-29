@@ -12,6 +12,6 @@ public class SimpleGetController extends AbstractGetController {
         if (requestPath.isEmpty()) {
             throw new IllegalArgumentException("requestPath cannot be empty");
         }
-        httpResponse.responseResource(requestPath);
+        httpResponse.forward(requestPath);
     }
 }

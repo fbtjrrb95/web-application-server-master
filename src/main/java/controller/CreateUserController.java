@@ -7,11 +7,13 @@ import org.slf4j.LoggerFactory;
 import service.HttpRequest;
 import service.HttpResponse;
 
+import java.io.IOException;
+
 public class CreateUserController extends AbstractPostController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override
-    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) {
+    public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String userId = httpRequest.getParameter("userId");
         String password = httpRequest.getParameter("password");
         String name = httpRequest.getParameter("name");
@@ -22,6 +24,6 @@ public class CreateUserController extends AbstractPostController {
 
         DataBase.addUser(user);
 
-        httpResponse.response302Header("/index.html");
+        httpResponse.sendRedirect("/index.html");
     }
 }
