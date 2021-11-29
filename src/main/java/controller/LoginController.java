@@ -17,11 +17,11 @@ public class LoginController  extends AbstractPostController {
 
         // login 실패 시, redirectUrl 설정
         if (userById == null || !requestPassword.equals(userById.getPassword())) {
-            httpResponse.responseResource("/user/login_failed.html");
+            httpResponse.forward("/user/login_failed.html");
             return;
         }
 
         // login 성공, redirectUrl 설정
-        httpResponse.response302LoginSuccessHeader();
+        httpResponse.sendRedirect("/index.html");
     }
 }

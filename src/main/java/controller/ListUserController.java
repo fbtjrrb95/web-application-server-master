@@ -6,12 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.HttpRequest;
 import service.HttpResponse;
-import util.HttpRequestUtils;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
 import java.util.Collection;
-import java.util.Map;
 
 public class ListUserController extends AbstractGetController {
 
@@ -23,12 +20,11 @@ public class ListUserController extends AbstractGetController {
         // 로그인이 되어 있으면 유저 리스트를 반환
         // 되어있지 않으면 로그인화면 반환
         if (!isLogined(httpRequest)) {
-            httpResponse.responseResource("/user/login.html");
+            httpResponse.forward("/user/login.html");
             return;
         }
 
-        byte[] body = getUserList().getBytes(StandardCharsets.UTF_8);
-        httpResponse.responseResource(body);
+        httpResponse.forwardBody(getUserList());
     }
 
     private boolean isLogined(HttpRequest httpRequest) {
