@@ -75,4 +75,8 @@
 * 경험이 많지 않은 상태에서는 일단 새로운 객체를 추가했으면 객체를 최대한 활용하기 위해 노력한다. 
   * 객체에서 값을 꺼낸 후 로직을 구현하려고 하지 말고, 가지고 있는 객체에 메시지를 보내 일을 시키도록 연습한다.
   * 객체를 최대한 활용했는 데 복잡도가 증가하고 책임이 점점 더 많아진다는 느낌이 드는 순간 새로운 객체를 추가한다.
-  * https://github.com/slipp/web-application-server 참고
+* https://github.com/slipp/web-application-server 참고
+* abstract class 에 꼭 abstract method 가 없어도 된다.
+  * protected method 를 사용하여 조금 더 자유롭게 오버라이딩하도록 할 수 있다. 
+    * 선택적으로 오버라이딩할 수 있다. 
+  * abstract class 자체로 initialize 될 수 없다는 의의로 사용할 수 있다. 
