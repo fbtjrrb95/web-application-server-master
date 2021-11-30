@@ -10,7 +10,7 @@ import service.HttpResponse;
 import java.io.IOException;
 import java.util.Collection;
 
-public class ListUserController extends AbstractGetController {
+public class ListUserController extends AbstractController {
 
     private static final Logger log = LoggerFactory.getLogger(ListUserController.class);
 

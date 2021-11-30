@@ -1,31 +1,24 @@
 package controller;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class ControllerFactory {
 
     private static SimpleGetController simpleGetController = new SimpleGetController();
-    private static LoginController loginController = new LoginController();
-    private static ListUserController listUserController = new ListUserController();
-    private static CreateUserController createUserController = new CreateUserController();
-
     private static ControllerFactory controllerFactory = new ControllerFactory();
+    private static Map<String, Controller> controllerMap = new HashMap<>();
+
+    static {
+        controllerMap.put("/user/create", new CreateUserController());
+        controllerMap.put("/user/login", new LoginController());
+        controllerMap.put("/user/list", new ListUserController());
+    }
 
     private ControllerFactory () {}
 
     public static Controller getInstance(String requestPath) {
-
-        if ("/user/login".equals(requestPath)) {
-            return loginController;
-        }
-
-        if ("/user/create".equals(requestPath)) {
-            return createUserController;
-        }
-
-        if ("/user/list".equals(requestPath)) {
-            return listUserController;
-        }
-
-        return simpleGetController;
+        return controllerMap.getOrDefault(requestPath, simpleGetController);
     }
 
 
