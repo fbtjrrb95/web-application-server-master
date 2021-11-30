@@ -9,7 +9,7 @@ import service.HttpResponse;
 
 import java.io.IOException;
 
-public class CreateUserController extends AbstractPostController {
+public class CreateUserController extends AbstractController {
     private static final Logger log = LoggerFactory.getLogger(CreateUserController.class);
 
     @Override

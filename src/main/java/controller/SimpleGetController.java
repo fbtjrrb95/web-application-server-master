@@ -5,7 +5,7 @@ import service.HttpResponse;
 
 import java.io.IOException;
 
-public class SimpleGetController extends AbstractGetController {
+public class SimpleGetController extends AbstractController {
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String requestPath = httpRequest.getPath();

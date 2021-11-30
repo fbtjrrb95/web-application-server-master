@@ -7,7 +7,7 @@ import service.HttpResponse;
 
 import java.io.IOException;
 
-public class LoginController  extends AbstractPostController {
+public class LoginController  extends AbstractController {
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String requestUserId = httpRequest.getParameter("userId");
