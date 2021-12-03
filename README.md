@@ -80,3 +80,4 @@
   * protected method 를 사용하여 조금 더 자유롭게 오버라이딩하도록 할 수 있다. 
     * 선택적으로 오버라이딩할 수 있다. 
   * abstract class 자체로 initialize 될 수 없다는 의의로 사용할 수 있다. 
+* 
