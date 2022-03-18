@@ -14,7 +14,7 @@
 * 구현을 완료한 후 구현 과정에서 새롭게 알게된 내용, 궁금한 내용을 기록한다.
 * 각 요구사항을 구현하는 것이 중요한 것이 아니라 구현 과정을 통해 학습한 내용을 인식하는 것이 배움에 중요하다. 
 
-### 요구사항 1 - http://localhost:8080/index.html로 접속시 응답
+### http://localhost:8080/index.html로 접속시 응답
 * inputStream 으로 문자열 읽는 방법
 ```
     BufferedReader br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
@@ -34,28 +34,24 @@
   * e.g. HTTP/1.1 200 OK
 * 서버는 웹 페이지를 구성하는 모든 자원을 한번에 응답으로 보내지 않음
   * 여러 번의 요청과 응답을 주고 받게 됨.
-  
 
-### 요구사항 2 - get 방식으로 회원가입
-* 
-
-### 요구사항 3 - post 방식으로 회원가입
+### post 방식으로 회원가입
 * post 로 요청할 때에도, body 도 queryString 방식으로 들어온다.
 * e.g. username=tjrrb&password=password
 
-### 요구사항 4 - redirect 방식으로 이동
+### redirect 방식으로 이동
 * header 에 302 Found 로 저장하고, 
 * header 에 Location : {tempUrl} 저장하면 
 * 브라우저가 다시 tempUrl Get method 로 요청한다. 
 
-### 요구사항 5 - cookie
+### cookie
 * 서버는 헤더의 Set-Cookie 속성에 값을 넣어서 응답할 수 있다.
 * 그러면 그 쿠키는 브라우저에 저장된다.
-* 아무 속성을 주지 않았을 때, 이 쿠ㅎ키는 한 세션에서만 유지된다. 
+* 아무 속성을 주지 않았을 때, 이 쿠키는 한 세션에서만 유지된다. 
   * 세션, 쿠키 차이점 
 * final 키워드는 '한 번' 할당이 되고 변하지 않을 때 (혹은 변하지 않아야 할 때) 사용한다. 
 
-### 요구사항 6 - 사용자 목록 출력하기
+### 사용자 목록 출력하기
 * Boolean.parseBoolean 은 JsonParse 처럼 에러를 던지지 않는다. 
   * 내부 구현을 확인해보면 "true".equalsIgnore(arg) 로 되어 있다. 
 * http request cookies는 "logined=true; jsessionId=example" 이런 형식을 가진다.
@@ -65,10 +61,7 @@
   * 바이트 타입의 데이터를 쓸 수 있음. (기본적으로 outputStream 클래스의 Write 함수를 구현함.)
   * 바이트 타입 이외의 자바 타입도 쓸 수 있다. (e.g. writeBoolean, writeUTF, ...)
 
-### 요구사항 7 - stylesheet 적용
-
-
-### 요구사항 8 - refactoring code
+### refactoring code
 * private 메소드의 복잡도가 높아 별도의 테스트가 필요한 데 테스트하기 힘들다면 어딘가 리팩토링할 부분이 있겠다. 
   * 여기서는 RequestLine class 를 별도로 분리해서 해결했다.  
 
@@ -80,3 +73,10 @@
   * protected method 를 사용하여 조금 더 자유롭게 오버라이딩하도록 할 수 있다. 
     * 선택적으로 오버라이딩할 수 있다. 
   * abstract class 자체로 initialize 될 수 없다는 의의로 사용할 수 있다. 
+
+### 세션
+* 접근 제어자 public vs default vs protected vs private
+  * public: 외부 패키지, 외부 클래스에서 접근 가능
+  * protected: 해당 패키지 또는 해당 클래스를 상속받은 다른 클래스에서만 접근 가능
+  * default: 해당 패키지 내에서만 접근 가능
+  * private: 해당 클래스 안에서만 접근 가능
