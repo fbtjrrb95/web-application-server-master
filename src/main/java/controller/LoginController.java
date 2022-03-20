@@ -4,24 +4,25 @@ import db.DataBase;
 import model.User;
 import service.HttpRequest;
 import service.HttpResponse;
+import webserver.HttpSession;
 
 import java.io.IOException;
 
-public class LoginController  extends AbstractController {
+public class LoginController extends AbstractController {
     @Override
     public void doPost(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         String requestUserId = httpRequest.getParameter("userId");
         String requestPassword = httpRequest.getParameter("password");
 
-        User userById = DataBase.findUserById(requestUserId);
+        User user = DataBase.findUserById(requestUserId);
 
-        // login 실패 시, redirectUrl 설정
-        if (userById == null || !requestPassword.equals(userById.getPassword())) {
+        if (user == null || !requestPassword.equals(user.getPassword())) {
             httpResponse.forward("/user/login_failed.html");
             return;
         }
 
-        // login 성공, redirectUrl 설정
+        HttpSession session = httpRequest.getSession();
+        session.setAttribute("user", user);
         httpResponse.sendRedirect("/index.html");
     }
 }
