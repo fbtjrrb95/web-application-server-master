@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import util.HttpRequestUtils;
 import util.IOUtils;
+import webserver.HttpSession;
+import webserver.HttpSessions;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -17,9 +19,8 @@ public class HttpRequest {
 
     private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
 
-    private final Map<String, String> headersMap = new HashMap<>();
+    private final Map<String, String> headers = new HashMap<>();
     private Map<String, String> paramsMap = new HashMap<>();
-    private Map<String, String> cookiesMap;
     private RequestLine requestLine;
 
     public HttpRequest(InputStream inputStream) {
@@ -34,23 +35,16 @@ public class HttpRequest {
 
             buildHeadersMap(br);
             buildParamsMap(br);
-            buildCookiesMap();
 
         } catch (IOException e) {
             log.error(e.getMessage());
         }
     }
 
-    private void buildCookiesMap() {
-        String cookies = getHeader("Cookie");
-        cookiesMap = HttpRequestUtils.parseCookies(cookies);
-        log.debug("cookies : {}", cookies);
-    }
-
     private void buildParamsMap(BufferedReader br) throws IOException {
 
         if (getMethod().isPost()) {
-            int contentLength = Integer.parseInt(headersMap.get("Content-Length"));
+            int contentLength = Integer.parseInt(headers.get("Content-Length"));
             paramsMap = HttpRequestUtils.parseQueryString(IOUtils.readData(br, contentLength));
         } else {
             paramsMap = requestLine.getParams();
@@ -67,7 +61,7 @@ public class HttpRequest {
             
             log.debug("header : {}", line);
             String[] tokens = line.split(":");
-            headersMap.put(tokens[0].trim(), tokens[1].trim());
+            headers.put(tokens[0].trim(), tokens[1].trim());
 
             line = br.readLine();
         }
@@ -82,12 +76,16 @@ public class HttpRequest {
     }
 
     public String getHeader(String key) {
-        return headersMap.get(key);
+        return headers.get(key);
     }
 
     public String getParameter(String key) {
         return paramsMap.get(key);
     }
 
-    public String getCookie(String key) { return cookiesMap.get(key); }
+    public String getCookie(String key) { return headers.get(key); }
+
+    public HttpSession getSession() {
+        return HttpSessions.getSession(getCookie("JSESSIONID"));
+    }
 }

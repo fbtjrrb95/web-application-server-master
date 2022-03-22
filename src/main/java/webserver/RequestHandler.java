@@ -2,8 +2,6 @@ package webserver;
 
 import controller.Controller;
 import controller.ControllerFactory;
-import db.DataBase;
-import model.User;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.HttpRequest;
@@ -15,9 +13,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.util.Collection;
 import java.util.Map;
+import java.util.UUID;
 
 public class RequestHandler extends Thread {
     private static final Logger log = LoggerFactory.getLogger(RequestHandler.class);
@@ -39,6 +36,10 @@ public class RequestHandler extends Thread {
 
             HttpRequest httpRequest = new HttpRequest(inputStream);
             HttpResponse httpResponse = new HttpResponse(dataOutputStream);
+
+            if (httpRequest.getCookie("JSESSIONID") == null) {
+                httpResponse.addHeader("Set-Cookie", "JSESSIONID=" + UUID.randomUUID());
+            }
 
             String requestPath = httpRequest.getPath();
 

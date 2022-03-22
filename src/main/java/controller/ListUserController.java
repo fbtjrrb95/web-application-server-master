@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import service.HttpRequest;
 import service.HttpResponse;
+import webserver.HttpSession;
 
 import java.io.IOException;
 import java.util.Collection;
@@ -17,18 +18,18 @@ public class ListUserController extends AbstractController {
     @Override
     public void doGet(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
 
-        // 로그인이 되어 있으면 유저 리스트를 반환
-        // 되어있지 않으면 로그인화면 반환
-        if (!isLogined(httpRequest)) {
-            httpResponse.forward("/user/login.html");
+        if (!isLogined(httpRequest.getSession())) {
+            httpResponse.sendRedirect("/user/login.html");
             return;
         }
 
         httpResponse.forwardBody(getUserList());
     }
 
-    private boolean isLogined(HttpRequest httpRequest) {
-        return Boolean.parseBoolean(httpRequest.getCookie("logined"));
+    private boolean isLogined(HttpSession session) {
+        if (session == null) return false;
+        Object user = session.getAttribute("user");
+        return user != null;
     }
 
     private String getUserList() {
