@@ -6,7 +6,7 @@ import service.HttpResponse;
 
 import java.io.IOException;
 
-public abstract class AbstractController implements Controller{
+public abstract class AbstractController implements Controller {
     @Override
     public void service(HttpRequest httpRequest, HttpResponse httpResponse) throws IOException {
         HttpMethod method = httpRequest.getMethod();
